@@ -159,14 +159,23 @@ def layer8_spilt_out():
 
     conv = torch.nn.Conv2d(56, 16, kernel_size=3,
                            stride=1, padding=1, bias=False)
-    conv.load_state_dict(torch.load('layer8_spilt.pth',
+    conv.load_state_dict(torch.load('./vsd/layer8_spilt.pth',
                          map_location=lambda storage, loc: storage))
 
     with torch.no_grad():
         temp = conv(fin)
 
-    # 210.5 = M 驗證記得改回來
-    temp = (temp / 210.5).round()
+    # M 驗證記得改回來
+    temp = (temp / 211.06).round().int()
+
+    with open('FeatureMap/Layer8/conv_out_spilt', 'w+') as f:
+        for i in torch.squeeze(temp).numpy().tolist():
+            np.savetxt(f, i, fmt="%d", delimiter='\n')
+    
+    with open('FeatureMap_hex/Layer8/conv_out_spilt', 'w+') as f:
+        for i in torch.squeeze(temp).numpy().tolist():
+            np.savetxt(f, i, fmt="%x", delimiter='\n')
+
 
     fout = torch.zeros(1, 1, 100, 100)
 

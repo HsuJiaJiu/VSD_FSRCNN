@@ -129,32 +129,25 @@ if __name__ == '__main__':
         print("shift = " + str(shift))
         print("="*15)
 
-    '''
-    for w,x,y,z in zip(range(1,9),module_name, features_in_hook, features_out_hook):
-        filepath = 'FeatureMap/Layer{}/'.format(w)
-        os.makedirs(filepath)
-        f = open(filepath+'conv_in','ab+')
-        for i in torch.squeeze(y[0]):
-            np.savetxt(f, torch.int_repr(i).numpy(), fmt="%d")
-        f.close()
 
-        f = open(filepath+'conv_out','ab+')
-        for i in torch.squeeze(z[0]):
-            np.savetxt(f, torch.int_repr(i).numpy(), fmt="%d")
-        f.close()
-    
-    np.save('FeatureMap/ycbcr',ycbcr)
-    '''
-
-    for w,x,y,z in zip(range(1,9),module_name, features_in_hook, features_out_hook):
+    for w, x, y, z in zip(range(1, 9), module_name, features_in_hook, features_out_hook):
         filepath = 'FeatureMap/Layer{}/'.format(w)
-        os.makedirs(filepath)
-        with open(filepath + 'conv_in','w+') as f:
+        #os.makedirs(filepath)
+        with open(filepath + 'conv_in', 'w+') as f:
             for i in torch.int_repr(torch.squeeze(y[0])):
-                np.savetxt(f, i.numpy().tolist(), fmt="%x",delimiter='\n')
-        with open(filepath + 'conv_out','w+') as f:
+                np.savetxt(f, i.numpy().tolist(), fmt="%d", delimiter='\n')
+        with open(filepath + 'conv_out', 'w+') as f:
             for i in torch.int_repr(torch.squeeze(z[0])):
-                np.savetxt(f, i.numpy().tolist(), fmt="%x",delimiter='\n')
-        np.save('FeatureMap/ycbcr',ycbcr)
+                np.savetxt(f, i.numpy().tolist(), fmt="%d", delimiter='\n')
+        np.save('FeatureMap/ycbcr', ycbcr)
 
-                    
+    for w, x, y, z in zip(range(1, 9), module_name, features_in_hook, features_out_hook):
+        filepath = 'FeatureMap_hex/Layer{}/'.format(w)
+        #os.makedirs(filepath)
+        with open(filepath + 'conv_in', 'w+') as f:
+            for i in torch.int_repr(torch.squeeze(y[0])):
+                np.savetxt(f, i.numpy().tolist(), fmt="%x", delimiter='\n')
+        with open(filepath + 'conv_out', 'w+') as f:
+            for i in torch.int_repr(torch.squeeze(z[0])):
+                np.savetxt(f, i.numpy().tolist(), fmt="%x", delimiter='\n')
+        np.save('FeatureMap_hex/ycbcr', ycbcr)
