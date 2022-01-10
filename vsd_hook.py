@@ -35,7 +35,7 @@ if __name__ == '__main__':
     torch.quantization.convert(model, inplace=True)
 
     model.load_state_dict(torch.load(
-        'Qbest.pth', map_location=lambda storage, loc: storage))
+        './vsd/Qbest.pth', map_location=lambda storage, loc: storage))
 
     box1 = (250, 250, 350, 350)
     box2 = (100, 100, 200, 200)
@@ -145,3 +145,16 @@ if __name__ == '__main__':
     
     np.save('FeatureMap/ycbcr',ycbcr)
     '''
+
+    for w,x,y,z in zip(range(1,9),module_name, features_in_hook, features_out_hook):
+        filepath = 'FeatureMap/Layer{}/'.format(w)
+        os.makedirs(filepath)
+        with open(filepath + 'conv_in','w+') as f:
+            for i in torch.int_repr(torch.squeeze(y[0])):
+                np.savetxt(f, i.numpy().tolist(), fmt="%x",delimiter='\n')
+        with open(filepath + 'conv_out','w+') as f:
+            for i in torch.int_repr(torch.squeeze(z[0])):
+                np.savetxt(f, i.numpy().tolist(), fmt="%x",delimiter='\n')
+        np.save('FeatureMap/ycbcr',ycbcr)
+
+                    
