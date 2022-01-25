@@ -28,7 +28,7 @@ if __name__ == '__main__':
     torch.quantization.convert(model, inplace=True)
 
     model.load_state_dict(torch.load(
-        'Qbest.pth', map_location=lambda storage, loc: storage))
+        'vsd/Qbest.pth', map_location=lambda storage, loc: storage))
 
     image = pil_image.open(args_img).convert('RGB')
     resultPicture = pil_image.new('RGB', (500, 500), (0, 0, 0))
@@ -62,5 +62,4 @@ if __name__ == '__main__':
 
             resultPicture.paste(output, (box[0], box[1]))
 
-    resultPicture.save(args_img.replace(
-        '.', '_spilt_fsrcnn_x{}.'.format(args_scale)))
+    resultPicture.save(args_img.replace('.', '_spilt_fsrcnn_x{}.'.format(args_scale)))

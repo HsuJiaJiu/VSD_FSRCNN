@@ -11,7 +11,7 @@ if __name__ == '__main__':
     torch.backends.quantized.engine = 'qnnpack'
 
     args_scale = 4
-    args_img = 'data/lenna.bmp'
+    args_img = 'data/butterfly_GT.bmp'
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -25,9 +25,9 @@ if __name__ == '__main__':
     torch.quantization.convert(model, inplace=True)
 
     model.load_state_dict(torch.load(
-        'Qbest.pth', map_location=lambda storage, loc: storage))
+        './vsd/Qbest.pth', map_location=lambda storage, loc: storage))
 
-    image = pil_image.open(args_img).convert('RGB')
+    image = pil_image.open(args_img).resize((500,500)).convert('RGB')
 
     image_width = (image.width // args_scale) * args_scale
     image_height = (image.height // args_scale) * args_scale

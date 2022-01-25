@@ -25,7 +25,11 @@ def singleHex():
 
 
 def spiltHex():
+    '''
     with open('FeatureMap_hex/Layer8/conv_out_spilt', 'r') as f:
+        temp = f.read().splitlines()
+    '''
+    with open('sram', 'r') as f:
         temp = f.read().splitlines()
 
     hexfile = [int(i, 16) for i in temp]
@@ -50,9 +54,8 @@ def spiltHex():
                       ).transpose([1, 2, 0])
     output = np.clip(convert_ycbcr_to_rgb(output), 0.0, 255.0).astype(np.uint8)
     output = pil_image.fromarray(output)
-    output.save('test.bmp')
+    output.save('sram.bmp')
 
 
 if __name__ == "__main__":
-    singleHex()
     spiltHex()

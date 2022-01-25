@@ -85,7 +85,7 @@ def layer8_deconv_sim():
     torch.quantization.prepare(model, inplace=True)
     torch.quantization.convert(model, inplace=True)
     model.load_state_dict(torch.load(
-        'Qbest.pth', map_location=lambda storage, loc: storage))
+        'vsd/Qbest.pth', map_location=lambda storage, loc: storage))
 
     layer8_weight = collections.OrderedDict()
     layer8_weight['weight'] = torch.zeros(56, 1, 9, 9)
@@ -109,8 +109,7 @@ def layer8_deconv_sim():
                     target_u = init_u + 4 * k
                     target_v = init_v + 4 * j
                     if (target_u < 9 and target_v < 9):
-                        temp['weight'][kernel_num][i][2-j][2 -
-                                                           k] = layer8_weight['weight'][i][0][target_v][target_u]
+                        temp['weight'][kernel_num][i][2-j][2-k] = layer8_weight['weight'][i][0][target_v][target_u]
 
     deconv = torch.nn.ConvTranspose2d(
         56, 1, kernel_size=9, stride=4, padding=4, output_padding=3, bias=False)
@@ -148,7 +147,9 @@ def layer8_deconv_sim():
 
     print(error)
 
-    torch.save(conv.state_dict(), "layer8_spilt.pth")
+    with open('weight/weight_layer8_conv', 'w+') as f:
+        temp = conv.state_dict()['weight'].numpy().flatten()
+        np.savetxt(f, temp, fmt="%d", delimiter='\n')
 
 
 def layer8_spilt_out():
@@ -171,15 +172,14 @@ def layer8_spilt_out():
     with open('FeatureMap/Layer8/conv_out_spilt', 'w+') as f:
         for i in torch.squeeze(temp).numpy().tolist():
             np.savetxt(f, i, fmt="%d", delimiter='\n')
-    
+
     with open('FeatureMap_hex/Layer8/conv_out_spilt', 'w+') as f:
         for i in torch.squeeze(temp).numpy().tolist():
             np.savetxt(f, i, fmt="%x", delimiter='\n')
 
-
     fout = torch.zeros(1, 1, 100, 100)
 
-    #Rearrange
+    # Rearrange
     for i in range(16):
         init_u = (i % 4)
         init_v = ((i // 4) % 4)
@@ -201,5 +201,27 @@ def layer8_spilt_out():
     output.save('test.bmp')
 
 
+def layer3_test():
+    with open('FeatureMap/Layer3/conv_in', 'r') as f:
+        fin = torch.from_numpy(
+            np.array(f.read().split(), dtype='f').reshape(1, 12, 25, 25))
+
+    conv = torch.nn.Conv2d(12, 12, kernel_size=3,
+                           stride=1, padding=1, bias=False)
+
+    layer3_weight = collections.OrderedDict()
+    layer3_weight['weight'] = torch.zeros(12, 12, 3, 3)
+
+    for i in range(12):
+        for j in range(12):
+            for k in range(3):
+                for l in range(3):
+                    layer3_weight['weight'][i][j][k][l] = torch.int_repr(
+                        torch.load('vsd/Qbest.pth')['mid_part.2.weight'][i][j][k][l]).item()
+
+    conv.load_state_dict(layer3_weight)
+    print(conv(fin-152)*0.039)
+
+
 if __name__ == "__main__":
-    layer8_spilt_out()
+    layer8_deconv_sim()
